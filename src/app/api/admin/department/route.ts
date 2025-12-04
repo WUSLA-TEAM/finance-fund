@@ -41,3 +41,51 @@ export async function POST(request: Request) {
         );
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        const body = await request.json();
+        const { id } = body;
+
+        if (!id) {
+            return NextResponse.json({ error: "Department ID is required" }, { status: 400 });
+        }
+
+        // Check if department has students
+        const deptWithStudents = await prisma.department.findUnique({
+            where: { id },
+            include: { _count: { select: { students: true } } }
+        });
+
+        if (!deptWithStudents) {
+            return NextResponse.json({ error: "Department not found" }, { status: 404 });
+        }
+
+        // Optional: Block deletion if students exist, or allow cascade (Prisma schema handles cascade if configured, but usually good to warn)
+        // For developer console, we might want to allow force delete or just delete.
+        // Let's assume we delete everything related to it if we proceed.
+
+        // Delete students first if not cascading in DB (though we added cascade to contributions, student->dept relation usually restricts)
+        // If we want to delete department, we must delete students first.
+
+        await prisma.contribution.deleteMany({
+            where: { student: { departmentId: id } }
+        });
+
+        await prisma.student.deleteMany({
+            where: { departmentId: id }
+        });
+
+        await prisma.department.delete({
+            where: { id },
+        });
+
+        return NextResponse.json({ message: "Department deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting department:", error);
+        return NextResponse.json(
+            { error: "Failed to delete department", details: error instanceof Error ? error.message : String(error) },
+            { status: 500 }
+        );
+    }
+}

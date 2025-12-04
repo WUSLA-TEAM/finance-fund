@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, departmentId, amountPaid, force } = body;
+        const { name, departmentId, amountPaid, force, action } = body; // action: 'create' | 'update' | undefined
 
         // Validation
         if (!name || !departmentId || amountPaid === undefined) {
@@ -14,8 +14,30 @@ export async function POST(request: Request) {
             );
         }
 
+        // If action is explicitly 'create', skip duplicate check and just create
+        if (action === 'create') {
+            const status = amountPaid >= 5000 ? "COMPLETED" : amountPaid > 0 ? "PARTIAL" : "PENDING";
+            const student = await prisma.student.create({
+                data: {
+                    name: name.trim(),
+                    departmentId,
+                    amountPaid,
+                    status,
+                    target: 5000,
+                },
+            });
+
+            await prisma.contribution.create({
+                data: {
+                    amount: amountPaid,
+                    studentId: student.id
+                }
+            });
+
+            return NextResponse.json(student);
+        }
+
         // Fetch all students in the department to do a robust JS-based fuzzy check
-        // (Avoids Prisma case-sensitivity quirks/types for now)
         const deptStudents = await prisma.student.findMany({
             where: { departmentId },
             select: { id: true, name: true, amountPaid: true }
@@ -29,8 +51,9 @@ export async function POST(request: Request) {
         let student;
 
         if (existingStudent) {
-            // If duplicate found and not forced, ask for confirmation
-            if (!force) {
+            // If duplicate found and no action specified (or force is false), ask for confirmation
+            // We now support 'action' param. If action is 'update', we proceed.
+            if (action !== 'update' && !force) {
                 return NextResponse.json({
                     requiresConfirmation: true,
                     message: `Student "${existingStudent.name}" already exists in this department.`,
@@ -38,7 +61,7 @@ export async function POST(request: Request) {
                 });
             }
 
-            // Update existing
+            // Update existing (action === 'update' or force === true)
             const newAmount = existingStudent.amountPaid + amountPaid;
             const newStatus = newAmount >= 5000 ? "COMPLETED" : newAmount > 0 ? "PARTIAL" : "PENDING";
 

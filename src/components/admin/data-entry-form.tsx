@@ -36,7 +36,7 @@ export function DataEntryForm({ departments }: DataEntryFormProps) {
         );
     }
 
-    const submitData = async (force = false) => {
+    const submitData = async (action?: 'create' | 'update') => {
         setIsLoading(true);
         setMessage("");
 
@@ -48,7 +48,7 @@ export function DataEntryForm({ departments }: DataEntryFormProps) {
                     name,
                     departmentId,
                     amountPaid: Number(amountPaid),
-                    force
+                    action // Pass action if defined
                 }),
             });
 
@@ -83,12 +83,17 @@ export function DataEntryForm({ departments }: DataEntryFormProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await submitData(false);
+        await submitData();
     };
 
-    const handleConfirm = async () => {
+    const handleConfirmUpdate = async () => {
         setShowConfirm(false);
-        await submitData(true);
+        await submitData('update');
+    };
+
+    const handleConfirmCreateNew = async () => {
+        setShowConfirm(false);
+        await submitData('create');
     };
 
     return (
@@ -168,20 +173,28 @@ export function DataEntryForm({ departments }: DataEntryFormProps) {
                         <p className="text-gray-300 text-sm mb-6">
                             {pendingData?.message || "This student already exists."}
                             <br />
-                            Do you want to add this contribution to the existing student?
+                            <span className="text-yellow-400 text-xs mt-2 block">
+                                Existing: {pendingData?.existingStudent?.name} (Paid: ₹{pendingData?.existingStudent?.amountPaid})
+                            </span>
                         </p>
-                        <div className="flex gap-3">
+                        <div className="flex flex-col gap-3">
                             <button
-                                onClick={() => setShowConfirm(false)}
-                                className="flex-1 py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
+                                onClick={handleConfirmUpdate}
+                                className="w-full py-2 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors"
                             >
-                                Cancel
+                                Add to Existing Student
                             </button>
                             <button
-                                onClick={handleConfirm}
-                                className="flex-1 py-2 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors"
+                                onClick={handleConfirmCreateNew}
+                                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"
                             >
-                                Confirm & Add
+                                Create New Student Record
+                            </button>
+                            <button
+                                onClick={() => setShowConfirm(false)}
+                                className="w-full py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
+                            >
+                                Cancel
                             </button>
                         </div>
                     </div>

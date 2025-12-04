@@ -17,9 +17,10 @@ interface Student {
 
 interface StudentTableProps {
     students?: Student[]; // Make optional to avoid build errors if parent doesn't pass it yet
+    className?: string;
 }
 
-export function StudentTable({ students = [] }: StudentTableProps) {
+export function StudentTable({ students = [], className }: StudentTableProps) {
     const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
     const [filter, setFilter] = useState("ALL");
@@ -83,7 +84,7 @@ export function StudentTable({ students = [] }: StudentTableProps) {
     };
 
     return (
-        <div className="col-span-12 lg:col-span-4">
+        <div className={className || "col-span-12 lg:col-span-4"}>
             <div className="content-panel h-full relative">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-800">

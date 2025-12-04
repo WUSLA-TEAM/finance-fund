@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useSpring, useTransform } from "framer-motion";
-import { Bell, Search, TrendingUp } from "lucide-react";
+import { Bell, Search, TrendingUp, Database } from "lucide-react";
 import React, { useEffect } from "react";
 
 interface HeroStatsProps {
@@ -100,38 +100,14 @@ export function HeroStats({ totalCollected, goal, topStudents, dailyStats }: Her
         };
     };
 
-    // Real-time polling
-    const [stats, setStats] = React.useState({
-        totalCollected,
-        goal,
-        topStudents,
-        dailyStats
-    });
-
-    useEffect(() => {
-        // Initial set from props
-        setStats({ totalCollected, goal, topStudents, dailyStats });
-
-        const interval = setInterval(async () => {
-            try {
-                const res = await fetch('/api/stats');
-                if (res.ok) {
-                    const newStats = await res.json();
-                    setStats(newStats);
-                }
-            } catch (error) {
-                console.error("Failed to poll stats:", error);
-            }
-        }, 3000); // Poll every 3 seconds
-
-        return () => clearInterval(interval);
-    }, [totalCollected, goal, topStudents, dailyStats]);
+    // Real-time polling is now handled by the parent DashboardView
+    // We just use the props directly
 
     // Use local state for rendering
-    const currentTotalCollected = stats.totalCollected;
-    const currentGoal = stats.goal;
-    const currentTopStudents = stats.topStudents;
-    const currentDailyStats = stats.dailyStats;
+    const currentTotalCollected = totalCollected;
+    const currentGoal = goal;
+    const currentTopStudents = topStudents;
+    const currentDailyStats = dailyStats;
     const currentPercentage = Math.min((currentTotalCollected / (currentGoal > 0 ? currentGoal : 1000000)) * 100, 100);
     const currentTheme = getTheme(currentPercentage);
 
@@ -144,6 +120,9 @@ export function HeroStats({ totalCollected, goal, topStudents, dailyStats }: Her
                     <p className="text-gray-400 text-sm">Overview of financial status</p>
                 </div>
                 <div className="flex items-center gap-4">
+                    <a href="/developer" className="bg-white/10 p-2 rounded-full hover:bg-white/20 cursor-pointer transition-colors" title="Developer Console">
+                        <Database size={20} />
+                    </a>
                     <div className="bg-white/10 p-2 rounded-full hover:bg-white/20 cursor-pointer transition-colors">
                         <Search size={20} />
                     </div>
