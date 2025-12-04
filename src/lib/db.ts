@@ -2,12 +2,9 @@ import { PrismaClient } from "@prisma/client";
 
 const prismaClientSingleton = () => {
     return new PrismaClient({
-        log: ["query"],
-        datasources: {
-            db: {
-                url: process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL
-            }
-        }
+        log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+        // Remove datasources override - let schema.prisma handle URL configuration
+        // This fixes the prepared statement error in Vercel serverless
     });
 };
 
@@ -17,4 +14,6 @@ declare global {
 
 export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
 
-if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
+if (process.env.NODE_ENV !== "production") {
+    globalThis.prismaGlobal = prisma;
+}
