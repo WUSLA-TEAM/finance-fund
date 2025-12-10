@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/sidebar";
 import { MainContent } from "@/components/main-content";
 import { TransactionsPanel } from "@/components/transactions-panel";
 import { AutoRefresh } from "@/components/ui/auto-refresh";
+import { MobileWelcome } from "@/components/onboarding/mobile-welcome";
 import { Menu, GraduationCap } from "lucide-react";
 
 interface DashboardData {
@@ -22,6 +23,7 @@ interface DashboardData {
         dailyStats: {
             day: string;
             amount: number;
+            frequency?: number;
         }[];
     };
     departments: {
@@ -52,6 +54,7 @@ export function DashboardView({ initialData }: DashboardViewProps) {
 
     return (
         <div className="app-wrapper relative">
+            <MobileWelcome />
             <AutoRefresh intervalMs={8000} />
 
             {/* Mobile Header */}

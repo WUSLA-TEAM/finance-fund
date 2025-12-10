@@ -9,10 +9,20 @@ export function InstallPrompt() {
     const [isIOS, setIsIOS] = useState(false);
     const [showIOSPrompt, setShowIOSPrompt] = useState(false);
 
+    const [isMobile, setIsMobile] = useState(false);
+
     useEffect(() => {
         // Check for iOS
         const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
         setIsIOS(isIosDevice);
+
+        // Check if mobile width (phone)
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
 
         // Capture install event
         const handler = (e: Event) => {
@@ -21,7 +31,10 @@ export function InstallPrompt() {
         };
         window.addEventListener("beforeinstallprompt", handler);
 
-        return () => window.removeEventListener("beforeinstallprompt", handler);
+        return () => {
+            window.removeEventListener("beforeinstallprompt", handler);
+            window.removeEventListener('resize', checkMobile);
+        }
     }, []);
 
     const handleInstallClick = async () => {
@@ -40,6 +53,11 @@ export function InstallPrompt() {
         }
     };
 
+    // Only show on mobile devices
+    if (!isMobile) return null;
+
+    // Logic: Show if we have a prompt (Android) OR if we are on iOS
+    // AND must be mobile
     if (!deferredPrompt && !isIOS) return null;
 
     return (

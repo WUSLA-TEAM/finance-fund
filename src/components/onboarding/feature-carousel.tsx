@@ -23,7 +23,11 @@ const features = [
     }
 ];
 
-export function FeatureCarousel() {
+interface FeatureCarouselProps {
+    onComplete?: () => void;
+}
+
+export function FeatureCarousel({ onComplete }: FeatureCarouselProps) {
     return (
         <div className="w-full max-w-4xl mx-auto px-6 py-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -54,7 +58,10 @@ export function FeatureCarousel() {
                 transition={{ delay: 3, duration: 1 }}
                 className="text-center mt-12"
             >
-                <button className="px-8 py-4 rounded-full bg-white text-black font-bold text-lg hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                <button
+                    onClick={onComplete}
+                    className="px-8 py-4 rounded-full bg-white text-black font-bold text-lg hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.3)]"
+                >
                     Get Started
                 </button>
             </motion.div>
