@@ -38,7 +38,7 @@ export function CountUp({
             if (ref.current) {
                 ref.current.textContent = prefix + new Intl.NumberFormat('en-IN', {
                     maximumFractionDigits: 0
-                }).format(latest.toFixed(0)) + suffix;
+                }).format(Math.round(latest)) + suffix;
             }
         });
     }, [springValue, prefix, suffix]);

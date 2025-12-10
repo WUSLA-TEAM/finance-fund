@@ -104,7 +104,6 @@ async function getDashboardData() {
   return {
     stats: { totalCollected, goal, topStudents, dailyStats },
     departments,
-    departments,
     students: recentActivity
   };
 }
