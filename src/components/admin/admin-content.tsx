@@ -49,22 +49,38 @@ function formatCurrency(amount: number): string {
 export function AdminContent({ departments, recentStudents }: AdminContentProps) {
     const router = useRouter();
 
-    // Student form state
+    // Bulk Import state
+    const [activeTab, setActiveTab] = useState<"manual" | "bulk">("manual");
+    const [importFile, setImportFile] = useState<File | null>(null);
+    const [importLoading, setImportLoading] = useState(false);
+    const [importMessage, setImportMessage] = useState("");
+    const fileInputRef = useState<any>(null); // Hacky ref
+
+    // Receipt / Reference State
+    const [receiptFile, setReceiptFile] = useState<File | null>(null);
+    const [referenceNote, setReferenceNote] = useState("");
+    // Student form state (Manual)
     const [studentName, setStudentName] = useState("");
     const [admissionNumber, setAdmissionNumber] = useState("");
+    // departmentId is needed for both manual and bulk, but we had it before?
+    // Wait, departmentId usage in line 70 suggests it was missing too?
+    // Let's check line 70: if (!importFile || !departmentId)
+    // We need to make sure departmentId is defined.
+    // In original file it was: const [departmentId, setDepartmentId] = useState(departments[0]?.id || "");
     const [departmentId, setDepartmentId] = useState(departments[0]?.id || "");
     const [amountPaid, setAmountPaid] = useState("");
     const [studentLoading, setStudentLoading] = useState(false);
     const [studentMessage, setStudentMessage] = useState("");
 
     // Update payment state
-    const [selectedDeptForUpdate, setSelectedDeptForUpdate] = useState(""); // Department filter
+    const [selectedDeptForUpdate, setSelectedDeptForUpdate] = useState("");
     const [selectedStudent, setSelectedStudent] = useState("");
     const [additionalAmount, setAdditionalAmount] = useState("");
     const [quickSearchQuery, setQuickSearchQuery] = useState("");
     const [updateLoading, setUpdateLoading] = useState(false);
     const [updateMessage, setUpdateMessage] = useState("");
     const [searchStatus, setSearchStatus] = useState<{ found: boolean; msg: string } | null>(null);
+
 
     // Department form state
     const [deptName, setDeptName] = useState("");
@@ -152,6 +168,43 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
             setStudentLoading(false);
         }
     };
+    const handleBulkImport = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setImportLoading(true);
+        setImportMessage("");
+
+        if (!importFile || !departmentId) {
+            setImportMessage("Please select a file and department");
+            setImportLoading(false);
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append("file", importFile);
+            formData.append("departmentId", departmentId);
+
+            const res = await fetch("/api/admin/import-students", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setImportMessage(`✓ ${data.message}`);
+                setImportFile(null);
+                router.refresh();
+                setTimeout(() => setImportMessage(""), 5000);
+            } else {
+                setImportMessage(`Error: ${data.error || "Import failed"}`);
+            }
+        } catch (error) {
+            setImportMessage("Network error during import");
+        } finally {
+            setImportLoading(false);
+        }
+    };
 
     const handleUpdatePayment = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -165,13 +218,15 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
         }
 
         try {
+            const formData = new FormData();
+            formData.append("studentId", selectedStudent);
+            formData.append("amount", additionalAmount);
+            if (referenceNote) formData.append("reference", referenceNote);
+            if (receiptFile) formData.append("file", receiptFile);
+
             const res = await fetch("/api/admin/update-payment", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    studentId: selectedStudent,
-                    amount: Number(additionalAmount) || 0,
-                }),
+                body: formData,
             });
 
             const data = await res.json();
@@ -179,8 +234,10 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
             if (res.ok) {
                 setUpdateMessage(`✓ Added ${formatCurrency(Number(additionalAmount))} - New total: ${formatCurrency(data.newTotal)}`);
                 setAdditionalAmount("");
+                setReferenceNote("");
+                setReceiptFile(null);
                 setSelectedStudent("");
-                setQuickSearchQuery(""); // Clear search as well
+                setQuickSearchQuery("");
                 router.refresh();
                 setTimeout(() => setUpdateMessage(""), 4000);
             } else {
@@ -192,6 +249,9 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
             setUpdateLoading(false);
         }
     };
+
+
+
 
     const handleDeptSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -300,72 +360,138 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
                         <div className="admin-card-icon">
                             <UserPlus size={20} />
                         </div>
-                        <h2 className="admin-card-title">Add New Student</h2>
+                        <h2 className="admin-card-title">Add Students</h2>
                     </div>
 
-                    <form onSubmit={handleStudentSubmit} className="admin-form">
-                        <div className="form-group">
-                            <label className="form-label">Student Name</label>
-                            <input
-                                type="text"
-                                required
-                                value={studentName}
-                                onChange={(e) => setStudentName(e.target.value)}
-                                className="form-input"
-                                placeholder="Enter name"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">Admission / CIC Number</label>
-                            <input
-                                type="text"
-                                required
-                                value={admissionNumber}
-                                onChange={(e) => setAdmissionNumber(e.target.value)}
-                                className="form-input"
-                                placeholder="e.g. CIC-123"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">Department</label>
-                            <select
-                                value={departmentId}
-                                onChange={(e) => setDepartmentId(e.target.value)}
-                                className="form-select"
-                            >
-                                {departments.map((dept) => (
-                                    <option key={dept.id} value={dept.id}>
-                                        {dept.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">Initial Amount (₹)</label>
-                            <input
-                                type="number"
-                                min="0"
-                                value={amountPaid}
-                                onChange={(e) => setAmountPaid(e.target.value)}
-                                className="form-input"
-                                placeholder="0"
-                            />
-                        </div>
-
-                        <button type="submit" className="form-btn primary" disabled={studentLoading}>
-                            <Save size={18} />
-                            {studentLoading ? "Saving..." : "Add Student"}
+                    <div className="flex gap-2 p-4 pb-0 border-b border-white/5">
+                        <button
+                            onClick={() => setActiveTab("manual")}
+                            className={`px-3 py-1.5 text-xs rounded-md transition-colors ${activeTab === "manual" ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white"}`}
+                        >
+                            Manual Entry
                         </button>
+                        <button
+                            onClick={() => setActiveTab("bulk")}
+                            className={`px-3 py-1.5 text-xs rounded-md transition-colors ${activeTab === "bulk" ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white"}`}
+                        >
+                            Bulk Import (CSV)
+                        </button>
+                    </div>
 
-                        {studentMessage && (
-                            <div className={`form-message ${studentMessage.includes('Error') ? 'error' : 'success'}`}>
-                                {studentMessage}
+                    {activeTab === "manual" ? (
+                        <form onSubmit={handleStudentSubmit} className="admin-form">
+                            <div className="form-group">
+                                <label className="form-label">Department</label>
+                                <select
+                                    value={departmentId}
+                                    onChange={(e) => setDepartmentId(e.target.value)}
+                                    className="form-select"
+                                >
+                                    {departments.map((dept) => (
+                                        <option key={dept.id} value={dept.id}>
+                                            {dept.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
-                        )}
-                    </form>
+
+                            <div className="form-group">
+                                <label className="form-label">Student Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={studentName}
+                                    onChange={(e) => setStudentName(e.target.value)}
+                                    className="form-input"
+                                    placeholder="Enter name"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Admission / CIC Number</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={admissionNumber}
+                                    onChange={(e) => setAdmissionNumber(e.target.value)}
+                                    className="form-input"
+                                    placeholder="e.g. CIC-123"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Initial Amount (₹)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={amountPaid}
+                                    onChange={(e) => setAmountPaid(e.target.value)}
+                                    className="form-input"
+                                    placeholder="0"
+                                />
+                            </div>
+
+                            <button type="submit" className="form-btn primary" disabled={studentLoading}>
+                                <Save size={18} />
+                                {studentLoading ? "Saving..." : "Add Student"}
+                            </button>
+
+                            {studentMessage && (
+                                <div className={`form-message ${studentMessage.includes('Error') ? 'error' : 'success'}`}>
+                                    {studentMessage}
+                                </div>
+                            )}
+                        </form>
+                    ) : (
+                        <form onSubmit={handleBulkImport} className="admin-form">
+                            <div className="form-group">
+                                <label className="form-label">Department</label>
+                                <select
+                                    value={departmentId}
+                                    onChange={(e) => setDepartmentId(e.target.value)}
+                                    className="form-select"
+                                >
+                                    {departments.map((dept) => (
+                                        <option key={dept.id} value={dept.id}>
+                                            {dept.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">CSV File</label>
+                                <div className="border border-dashed border-white/20 rounded-lg p-4 text-center hover:bg-white/5 transition-colors">
+                                    <input
+                                        type="file"
+                                        accept=".csv,.txt"
+                                        onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                                        className="hidden"
+                                        id="csv-upload"
+                                    />
+                                    <label htmlFor="csv-upload" className="cursor-pointer block">
+                                        <div className="text-sm text-muted-foreground mb-1">
+                                            {importFile ? importFile.name : "Click to select CSV"}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground opacity-60">
+                                            Format: Name, Admission No, Amount
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" className="form-btn primary" disabled={importLoading || !importFile}>
+                                <UserPlus size={18} />
+                                {importLoading ? "Importing..." : "Upload & Import"}
+                            </button>
+
+                            {importMessage && (
+                                <div className={`form-message ${importMessage.includes('Error') ? 'error' : 'success'}`}>
+                                    {importMessage}
+                                </div>
+                            )}
+                        </form>
+                    )}
                 </motion.div>
 
                 {/* Update Payment Form - NEW */}
@@ -498,8 +624,32 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
                             />
                         </div>
 
+                        <div className="form-group">
+                            <label className="form-label">4. Reference / Note (Optional)</label>
+                            <input
+                                type="text"
+                                value={referenceNote}
+                                onChange={(e) => setReferenceNote(e.target.value)}
+                                className="form-input"
+                                placeholder="e.g. Receipt No. 101"
+                                disabled={!selectedStudent}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">5. Attach Receipt (Optional)</label>
+                            <div className={`border border-white/10 rounded-lg p-2 ${!selectedStudent ? 'opacity-50' : ''}`}>
+                                <input
+                                    type="file"
+                                    onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
+                                    className="text-xs w-full text-muted-foreground file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
+                                    disabled={!selectedStudent}
+                                />
+                            </div>
+                        </div>
+
                         {selectedStudentInfo && additionalAmount && (
-                            <div className="new-total-preview">
+                            <div className="new-total-preview mt-4">
                                 <span>New Total:</span>
                                 <span className="new-amount">
                                     {formatCurrency(selectedStudentInfo.amountPaid + Number(additionalAmount))}

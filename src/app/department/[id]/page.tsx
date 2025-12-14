@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ArrowLeft, Users, Target, TrendingUp, Award, Trophy, Crown, Star } from "lucide-react";
 import { notFound } from "next/navigation";
 import { AutoRefresh } from "@/components/ui/auto-refresh";
+import { StudentList } from "@/components/department/student-list";
+import { checkAuth } from "@/lib/auth";
 
 interface DepartmentPageProps {
     params: Promise<{
@@ -99,6 +101,7 @@ export default async function DepartmentPage({ params }: DepartmentPageProps) {
     const participationCount = department.students.filter(s => s.amountPaid > 0).length;
     const participationRate = department.students.length > 0 ? (participationCount / department.students.length) * 100 : 0;
     const remaining = Math.max(department.target - department.totalCollected, 0);
+    const isAdmin = await checkAuth("admin");
 
     const club = getClubInfo(percentage);
     const ClubIcon = club.icon;
@@ -204,43 +207,8 @@ export default async function DepartmentPage({ params }: DepartmentPageProps) {
                 {/* Students List */}
                 <div className="students-section">
                     <h2 className="section-title">Students ({department.students.length})</h2>
-                    <div className="students-list">
-                        {department.students.map((student, index) => {
-                            const studentProgress = Math.min((student.amountPaid / 5000) * 100, 100);
-                            const status = student.amountPaid >= 5000 ? 'completed' : student.amountPaid > 0 ? 'partial' : 'pending';
-
-                            return (
-                                <div key={student.id} className="student-row">
-                                    <div className="student-rank">{index + 1}</div>
-                                    <div className="student-avatar">
-                                        {student.name.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div className="student-info">
-                                        <span className="student-name">{student.name}</span>
-                                        <span className="text-xs text-muted-foreground">{student.admissionNumber}</span>
-                                        <div className="student-progress-bar">
-                                            <div
-                                                className="student-progress-fill"
-                                                style={{ width: `${studentProgress}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="student-amount-section">
-                                        <span className="student-amount">{formatCurrency(student.amountPaid)}</span>
-                                        <span className={`student-status ${status}`}>
-                                            {status === 'completed' ? '✓ Complete' : status === 'partial' ? 'Partial' : 'Pending'}
-                                        </span>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                        {department.students.length === 0 && (
-                            <div className="empty-state">
-                                <Users size={48} />
-                                <p>No students in this department yet</p>
-                            </div>
-                        )}
-                    </div>
+                    <StudentList students={department.students} isAdmin={isAdmin} />
+                    {/* Removed manual mapping in favor of StudentList component */}
                 </div>
             </div>
         </main>

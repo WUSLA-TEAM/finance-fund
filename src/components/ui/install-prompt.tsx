@@ -11,6 +11,8 @@ export function InstallPrompt() {
 
     const [isMobile, setIsMobile] = useState(false);
 
+    const [isDismissed, setIsDismissed] = useState(false);
+
     useEffect(() => {
         // Check for iOS
         const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -39,7 +41,8 @@ export function InstallPrompt() {
 
     const handleInstallClick = async () => {
         if (isIOS) {
-            setShowIOSPrompt(true);
+            // Simple alert for iOS (or better, nothing/tooltip, but user wants banner)
+            alert("To install: Tap Share button -> Add to Home Screen");
             return;
         }
 
@@ -53,62 +56,42 @@ export function InstallPrompt() {
         }
     };
 
-    // Only show on mobile devices
+    if (isDismissed) return null;
     if (!isMobile) return null;
-
-    // Logic: Show if we have a prompt (Android) OR if we are on iOS
-    // AND must be mobile
     if (!deferredPrompt && !isIOS) return null;
 
     return (
-        <>
-            <button
-                onClick={handleInstallClick}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[var(--primary)] bg-[rgba(255,200,0,0.15)] rounded-xl hover:bg-[rgba(255,200,0,0.25)] transition-all mt-4 border border-[var(--primary-dark)] shadow-[var(--glow-primary)]"
+        <AnimatePresence>
+            <motion.div
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -100, opacity: 0 }}
+                className="fixed top-0 left-0 w-full z-[9999] bg-gradient-to-r from-yellow-500 to-amber-600 text-black px-4 py-3 shadow-lg flex items-center justify-between"
             >
-                <Download size={18} />
-                Install App
-            </button>
-
-            {/* iOS Instructions Modal */}
-            <AnimatePresence>
-                {showIOSPrompt && (
-                    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center pointer-events-none">
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto" onClick={() => setShowIOSPrompt(false)} />
-
-                        <motion.div
-                            initial={{ y: 100, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: 100, opacity: 0 }}
-                            className="bg-[var(--bg-panel)] w-full max-w-sm m-4 p-6 rounded-2xl border border-[var(--border-color)] shadow-2xl pointer-events-auto relative"
-                        >
-                            <h3 className="text-lg font-bold mb-2 text-white">Install on iPhone</h3>
-                            <p className="text-[var(--text-secondary)] text-sm mb-4">
-                                Install this app on your home screen for a better experience.
-                            </p>
-
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-8 h-8 flex items-center justify-center bg-[rgba(255,255,255,0.1)] rounded-lg">
-                                        <Share size={18} className="text-[var(--primary)]" />
-                                    </div>
-                                    <p className="text-sm text-[var(--text-main)]">1. Tap the <span className="font-bold">Share</span> button below</p>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-8 h-8 flex items-center justify-center bg-[rgba(255,255,255,0.1)] rounded-lg">
-                                        <div className="text-lg font-bold text-[var(--primary)]">+</div>
-                                    </div>
-                                    <p className="text-sm text-[var(--text-main)]">2. Select <span className="font-bold">Add to Home Screen</span></p>
-                                </div>
-                            </div>
-
-                            <div className="absolute top-0 right-0 p-4">
-                                <div className="w-12 h-1 bg-[rgba(255,255,255,0.2)] rounded-full mx-auto" />
-                            </div>
-                        </motion.div>
+                <div className="flex items-center gap-3" onClick={handleInstallClick}>
+                    <div className="bg-black/20 p-2 rounded-lg">
+                        <Download size={18} className="text-white" />
                     </div>
-                )}
-            </AnimatePresence>
-        </>
+                    <div className="flex flex-col">
+                        <span className="text-xs font-bold uppercase tracking-wider opacity-80">Install App</span>
+                        <span className="text-sm font-bold">Get the full experience</span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={handleInstallClick}
+                        className="px-3 py-1.5 bg-black text-white text-xs font-bold rounded-lg uppercase tracking-wide shadow-md"
+                    >
+                        Install
+                    </button>
+                    <button onClick={() => setIsDismissed(true)} className="p-1 opacity-60 hover:opacity-100">
+                        <div className="w-5 h-5 flex items-center justify-center border border-black/30 rounded-full">
+                            <span className="text-xs font-bold">✕</span>
+                        </div>
+                    </button>
+                </div>
+            </motion.div>
+        </AnimatePresence>
     );
 }

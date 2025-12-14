@@ -49,12 +49,14 @@ interface DashboardViewProps {
     initialData: DashboardData;
 }
 
+import { InstallPrompt } from "@/components/ui/install-prompt";
+
 export function DashboardView({ initialData }: DashboardViewProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
         <div className="app-wrapper relative">
-            <MobileWelcome />
+            <InstallPrompt />
             <AutoRefresh intervalMs={8000} />
 
             {/* Mobile Header */}

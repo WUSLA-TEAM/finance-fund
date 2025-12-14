@@ -60,7 +60,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 onClick={onClose}
             />
 
-            <aside className={`sidebar ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-[260px] transition-transform duration-300`}>
+            <aside className={`sidebar ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-[100] w-[260px] transition-transform duration-300`}>
                 <div className="sidebar-brand">
                     <div className="sidebar-brand-icon">
                         <GraduationCap size={22} />
@@ -97,9 +97,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <div style={{ marginTop: '12px', padding: '0 12px' }}>
                         <ThemeToggle />
                     </div>
-                    <div style={{ marginTop: '8px', padding: '0 12px' }}>
-                        <InstallPrompt />
-                    </div>
+
                 </div>
             </aside>
         </>

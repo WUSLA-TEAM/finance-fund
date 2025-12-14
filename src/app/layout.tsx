@@ -5,17 +5,21 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import { MobileOnboardingCheck } from "@/components/mobile-onboarding-check";
 
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-display", weight: ["400", "500", "600", "700"] });
 
 export const metadata: Metadata = {
   title: "Finance Fund Tracker",
   description: "Track department funds and contributions",
+  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#e8e4df",
+  themeColor: "#000000",
   maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -26,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${dmSans.variable} antialiased`} suppressHydrationWarning>
-        <MobileOnboardingCheck />
+        <ServiceWorkerRegister />
         <ThemeProvider defaultTheme="system">
           {children}
         </ThemeProvider>

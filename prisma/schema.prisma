@@ -38,6 +38,7 @@ model Contribution {
   amount    Float
   studentId String
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  reference String? // e.g. "Receipt Book", "Call Campaign"
   createdAt DateTime @default(now())
 
   @@index([studentId])

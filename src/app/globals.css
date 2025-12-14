@@ -28,6 +28,20 @@
     --radius-lg: 24px;
     --radius-md: 16px;
     --radius-sm: 12px;
+
+    /* Dynamic Component Backgrounds (Light Default) */
+    --sidebar-bg: rgba(255, 255, 255, 0.85);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --nav-hover-bg: rgba(0, 0, 0, 0.04);
+    --nav-active-bg: rgba(61, 90, 76, 0.1);
+    --nav-active-border: 1px solid rgba(61, 90, 76, 0.2);
+    --glass-border: 1px solid rgba(0, 0, 0, 0.06);
+    --glass-shine: 1px solid rgba(255, 255, 255, 0.6);
+
+    /* Form & Border Elements (Light) */
+    --input-bg: rgba(0, 0, 0, 0.05);
+    --input-border: 1px solid rgba(0, 0, 0, 0.1);
+    --border-subtle: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* ===== LIQUID GLASS THEME ===== */
@@ -61,35 +75,96 @@
 }
 
 .dark {
-    /* Base Colors - Deep Black/Green/Aurora */
+    /* Base Colors - Deep Luxury Black/Gold */
     --bg-main: #000000;
-    --bg-panel: rgba(20, 20, 20, 0.6);
+    --bg-panel: rgba(18, 18, 18, 0.6);
     --bg-sidebar: rgba(10, 10, 10, 0.6);
-    --bg-right: rgba(15, 15, 15, 0.6);
+    --bg-right: rgba(12, 12, 12, 0.6);
 
-    /* Brand Colors - Rich Gold/Amber */
-    --primary: #FFC800;
-    /* Attractive Dark Yellow (Gold) */
-    --primary-dark: #CC9900;
-    --primary-light: #FFD940;
-    --accent-gold: #f1fa8c;
-    /* Kept as soft yellow accent */
-    --error: #ff5555;
+    /* Brand Colors - Vivid Gold & Red Accents */
+    --primary: #FFD700;
+    /* Gold */
+    --primary-dark: #B8860B;
+    /* Dark Goldenrod */
+    --primary-light: #FFE55C;
+    --accent-gold: #FF4500;
+    /* OrangeRed for contrast/accent */
+    --error: #FF0033;
 
     /* Text */
     --text-main: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.8);
+    --text-secondary: rgba(255, 255, 255, 0.85);
     --text-muted: rgba(255, 255, 255, 0.5);
 
     /* Borders & Glass */
-    --border-color: rgba(255, 200, 0, 0.2);
-    --glass-border: 1px solid rgba(255, 200, 0, 0.15);
-    --glass-shine: 1px solid rgba(255, 200, 0, 0.3);
+    --border-color: rgba(255, 215, 0, 0.15);
+    --glass-border: 1px solid rgba(255, 215, 0, 0.1);
+    --glass-shine: 1px solid rgba(255, 215, 0, 0.25);
 
-    /* Shadows */
-    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --shadow-card: 0 16px 48px rgba(0, 0, 0, 0.7);
-    --glow-primary: 0 0 25px rgba(255, 200, 0, 0.4);
+    /* Shadows & Glows */
+    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 16px 48px rgba(0, 0, 0, 0.8);
+    --glow-primary: 0 0 30px rgba(255, 215, 0, 0.25);
+
+    /* Dynamic Component Backgrounds (Dark Override) */
+    --sidebar-bg: linear-gradient(180deg, rgba(20, 20, 20, 0.8) 0%, rgba(10, 10, 10, 0.8) 100%);
+    --card-bg: linear-gradient(145deg, rgba(30, 30, 30, 0.6) 0%, rgba(15, 15, 15, 0.7) 100%);
+    --nav-hover-bg: rgba(255, 215, 0, 0.08);
+    --nav-active-bg: rgba(255, 215, 0, 0.15);
+    --nav-active-border: 1px solid rgba(255, 215, 0, 0.3);
+
+    /* Form & Border Elements (Dark) */
+    --input-bg: rgba(255, 255, 255, 0.03);
+    --input-border: 1px solid rgba(255, 255, 255, 0.1);
+    --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Force Dark Mode on Mobile Devices (< 768px) */
+@media (max-width: 768px) {
+    :root {
+        /* Base Colors - Deep Luxury Black/Gold */
+        --bg-main: #000000;
+        --bg-panel: rgba(18, 18, 18, 0.6);
+        --bg-sidebar: rgba(10, 10, 10, 0.6);
+        --bg-right: rgba(12, 12, 12, 0.6);
+
+        /* Brand Colors - Vivid Gold & Red Accents */
+        --primary: #FFD700;
+        /* Gold */
+        --primary-dark: #B8860B;
+        /* Dark Goldenrod */
+        --primary-light: #FFE55C;
+        --accent-gold: #FF4500;
+        /* OrangeRed for contrast/accent */
+        --error: #FF0033;
+
+        /* Text */
+        --text-main: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.85);
+        --text-muted: rgba(255, 255, 255, 0.5);
+
+        /* Borders & Glass */
+        --border-color: rgba(255, 215, 0, 0.15);
+        --glass-border: 1px solid rgba(255, 215, 0, 0.1);
+        --glass-shine: 1px solid rgba(255, 215, 0, 0.25);
+
+        /* Shadows & Glows */
+        --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.6);
+        --shadow-card: 0 16px 48px rgba(0, 0, 0, 0.8);
+        --glow-primary: 0 0 30px rgba(255, 215, 0, 0.25);
+
+        /* Dynamic Component Backgrounds (Dark Override) */
+        --sidebar-bg: linear-gradient(180deg, rgba(20, 20, 20, 0.8) 0%, rgba(10, 10, 10, 0.8) 100%);
+        --card-bg: linear-gradient(145deg, rgba(30, 30, 30, 0.6) 0%, rgba(15, 15, 15, 0.7) 100%);
+        --nav-hover-bg: rgba(255, 215, 0, 0.08);
+        --nav-active-bg: rgba(255, 215, 0, 0.15);
+        --nav-active-border: 1px solid rgba(255, 215, 0, 0.3);
+
+        /* Form & Border Elements (Dark) */
+        --input-bg: rgba(255, 255, 255, 0.03);
+        --input-border: 1px solid rgba(255, 255, 255, 0.1);
+        --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
+    }
 }
 
 body {
@@ -142,7 +217,7 @@ body {
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-    background: linear-gradient(180deg, rgba(15, 15, 15, 0.7) 0%, rgba(10, 10, 10, 0.6) 100%);
+    background: var(--sidebar-bg);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: var(--glass-border);
@@ -150,6 +225,7 @@ body {
     padding: 32px 24px;
     display: flex;
     flex-direction: column;
+    z-index: 100 !important;
     /* height: 100%; */
 }
 
@@ -160,16 +236,16 @@ body {
 }
 
 .nav-link:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--nav-hover-bg);
     color: var(--primary);
     transform: translateX(4px);
 }
 
 .nav-link.active {
-    background: rgba(255, 200, 0, 0.15);
+    background: var(--nav-active-bg);
     /* Glassy Gold */
     color: var(--primary);
-    border: 1px solid rgba(255, 200, 0, 0.3);
+    border: var(--nav-active-border);
     box-shadow: var(--glow-primary);
 }
 
@@ -184,7 +260,7 @@ body {
 
 .stat-card {
     /* Override existing stat-card to be glass with gradient shine */
-    background: linear-gradient(145deg, rgba(30, 30, 30, 0.7) 0%, rgba(20, 20, 20, 0.6) 100%);
+    background: var(--card-bg);
     backdrop-filter: blur(20px);
     border: var(--glass-border);
     border-radius: var(--radius-md);
@@ -220,7 +296,7 @@ body {
 
 /* Tables */
 .table-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: var(--border-subtle);
     color: var(--text-secondary);
     text-transform: uppercase;
     font-size: 11px;
@@ -228,21 +304,21 @@ body {
 }
 
 .table-row {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: var(--border-subtle);
     transition: background 0.2s;
 }
 
 .table-row:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--nav-hover-bg);
 }
 
 /* Inputs */
 .search-input,
 .form-input,
 .form-select {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
+    background: var(--input-bg);
+    border: var(--input-border);
+    color: var(--text-main);
     border-radius: 12px;
     transition: all 0.2s;
 }
@@ -257,9 +333,10 @@ body {
 
 /* ===== RIGHT PANEL ===== */
 .right-panel {
-    background: linear-gradient(180deg, rgba(15, 15, 15, 0.7) 0%, rgba(10, 10, 10, 0.6) 100%);
+    background: var(--sidebar-bg);
     /* Match sidebar glass */
     backdrop-filter: blur(24px);
+
     border: var(--glass-border);
     border-radius: var(--radius-lg);
     border-left: var(--glass-border);
@@ -268,9 +345,11 @@ body {
 }
 
 .details-card {
-    background: rgba(0, 0, 0, 0.2);
-    /* Darker glass inside panel */
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--bg-panel);
+    border: var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    box-shadow: var(--shadow-soft);
 }
 
 /* ===== MODAL ===== */
@@ -595,7 +674,7 @@ body {
     padding: 14px 8px;
     border-radius: var(--radius-sm);
     transition: background 0.2s;
-    border-bottom: 1px solid rgba(61, 90, 76, 0.06);
+    border-bottom: var(--border-subtle);
 }
 
 .contributor-row:last-child {
@@ -603,7 +682,7 @@ body {
 }
 
 .contributor-row:hover {
-    background: rgba(61, 90, 76, 0.04);
+    background: var(--nav-hover-bg);
 }
 
 .contributor-rank {
@@ -1200,7 +1279,6 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .sidebar,
     .right-panel {
         display: none;
     }
@@ -1279,7 +1357,7 @@ body {
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: rgba(61, 90, 76, 0.1);
+    background: var(--nav-active-bg);
     color: var(--primary);
     display: flex;
     align-items: center;
@@ -1322,7 +1400,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: rgba(61, 90, 76, 0.1);
+    background: var(--nav-active-bg);
     color: var(--primary);
     display: flex;
     align-items: center;
