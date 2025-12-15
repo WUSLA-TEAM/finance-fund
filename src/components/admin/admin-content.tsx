@@ -63,19 +63,14 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
     // const [referenceNote, setReferenceNote] = useState(""); // Removed in favor of dynamic fields
 
     // Payment Method State
-    const [paymentMethod, setPaymentMethod] = useState("Cash");
+    const [paymentMethod, setPaymentMethod] = useState("CASH ON HAND"); // Default to Cash on Hand
     const [transactionId, setTransactionId] = useState("");
-    const [receiptNumber, setReceiptNumber] = useState("");
     const [paymentNote, setPaymentNote] = useState("");
 
     const paymentMethods = [
-        "Cash",
-        "GPay",
-        "PhonePe",
-        "Paytm",
-        "Bank Transfer",
-        "Receipt Book",
-        "Other"
+        "CAMPUS ACCOUNT",
+        "SPECIAL ACCOUNT",
+        "CASH ON HAND"
     ];
     // Student form state (Manual)
     const [studentName, setStudentName] = useState("");
@@ -238,11 +233,10 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
         try {
 
             // Construct reference string
+            // Construct reference string
             let finalReference = "";
-            if (["GPay", "PhonePe", "Paytm", "Bank Transfer"].includes(paymentMethod)) {
-                finalReference = `Method: ${paymentMethod} | Txn: ${transactionId || 'N/A'}`;
-            } else if (paymentMethod === "Receipt Book") {
-                finalReference = `Method: ${paymentMethod} | Receipt No: ${receiptNumber || 'N/A'}`;
+            if (["CAMPUS ACCOUNT", "SPECIAL ACCOUNT"].includes(paymentMethod)) {
+                finalReference = `Method: ${paymentMethod} | Ref: ${transactionId || 'N/A'}`;
             } else {
                 finalReference = `Method: ${paymentMethod} | Note: ${paymentNote || 'N/A'}`;
             }
@@ -266,7 +260,6 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
                 setAdditionalAmount("");
                 // Reset fields
                 setTransactionId("");
-                setReceiptNumber("");
                 setPaymentNote("");
                 setReceiptFile(null);
                 setSelectedStudent("");
@@ -673,29 +666,18 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
                             </select>
 
                             {/* Conditional Inputs */}
-                            {["GPay", "PhonePe", "Paytm", "Bank Transfer"].includes(paymentMethod) && (
+                            {["CAMPUS ACCOUNT", "SPECIAL ACCOUNT"].includes(paymentMethod) && (
                                 <input
                                     type="text"
                                     value={transactionId}
                                     onChange={(e) => setTransactionId(e.target.value)}
                                     className="form-input"
-                                    placeholder="Transaction ID / Ref No."
+                                    placeholder="Transaction Reference / Receipt No."
                                     disabled={!selectedStudent}
                                 />
                             )}
 
-                            {paymentMethod === "Receipt Book" && (
-                                <input
-                                    type="text"
-                                    value={receiptNumber}
-                                    onChange={(e) => setReceiptNumber(e.target.value)}
-                                    className="form-input"
-                                    placeholder="Receipt Number"
-                                    disabled={!selectedStudent}
-                                />
-                            )}
-
-                            {["Cash", "Other"].includes(paymentMethod) && (
+                            {paymentMethod === "CASH ON HAND" && (
                                 <input
                                     type="text"
                                     value={paymentNote}
