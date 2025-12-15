@@ -58,7 +58,25 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
 
     // Receipt / Reference State
     const [receiptFile, setReceiptFile] = useState<File | null>(null);
-    const [referenceNote, setReferenceNote] = useState("");
+    // Receipt / Reference State
+
+    // const [referenceNote, setReferenceNote] = useState(""); // Removed in favor of dynamic fields
+
+    // Payment Method State
+    const [paymentMethod, setPaymentMethod] = useState("Cash");
+    const [transactionId, setTransactionId] = useState("");
+    const [receiptNumber, setReceiptNumber] = useState("");
+    const [paymentNote, setPaymentNote] = useState("");
+
+    const paymentMethods = [
+        "Cash",
+        "GPay",
+        "PhonePe",
+        "Paytm",
+        "Bank Transfer",
+        "Receipt Book",
+        "Other"
+    ];
     // Student form state (Manual)
     const [studentName, setStudentName] = useState("");
     const [admissionNumber, setAdmissionNumber] = useState("");
@@ -218,10 +236,21 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
         }
 
         try {
+
+            // Construct reference string
+            let finalReference = "";
+            if (["GPay", "PhonePe", "Paytm", "Bank Transfer"].includes(paymentMethod)) {
+                finalReference = `Method: ${paymentMethod} | Txn: ${transactionId || 'N/A'}`;
+            } else if (paymentMethod === "Receipt Book") {
+                finalReference = `Method: ${paymentMethod} | Receipt No: ${receiptNumber || 'N/A'}`;
+            } else {
+                finalReference = `Method: ${paymentMethod} | Note: ${paymentNote || 'N/A'}`;
+            }
+
             const formData = new FormData();
             formData.append("studentId", selectedStudent);
             formData.append("amount", additionalAmount);
-            if (referenceNote) formData.append("reference", referenceNote);
+            formData.append("reference", finalReference);
             if (receiptFile) formData.append("file", receiptFile);
 
             const res = await fetch("/api/admin/update-payment", {
@@ -234,7 +263,11 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
             if (res.ok) {
                 setUpdateMessage(`✓ Added ${formatCurrency(Number(additionalAmount))} - New total: ${formatCurrency(data.newTotal)}`);
                 setAdditionalAmount("");
-                setReferenceNote("");
+                setAdditionalAmount("");
+                // Reset fields
+                setTransactionId("");
+                setReceiptNumber("");
+                setPaymentNote("");
                 setReceiptFile(null);
                 setSelectedStudent("");
                 setQuickSearchQuery("");
@@ -625,15 +658,53 @@ export function AdminContent({ departments, recentStudents }: AdminContentProps)
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">4. Reference / Note (Optional)</label>
-                            <input
-                                type="text"
-                                value={referenceNote}
-                                onChange={(e) => setReferenceNote(e.target.value)}
-                                className="form-input"
-                                placeholder="e.g. Receipt No. 101"
+                            <label className="form-label">4. Payment Details</label>
+
+                            {/* Method Selector */}
+                            <select
+                                value={paymentMethod}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                                className="form-select mb-2"
                                 disabled={!selectedStudent}
-                            />
+                            >
+                                {paymentMethods.map(method => (
+                                    <option key={method} value={method}>{method}</option>
+                                ))}
+                            </select>
+
+                            {/* Conditional Inputs */}
+                            {["GPay", "PhonePe", "Paytm", "Bank Transfer"].includes(paymentMethod) && (
+                                <input
+                                    type="text"
+                                    value={transactionId}
+                                    onChange={(e) => setTransactionId(e.target.value)}
+                                    className="form-input"
+                                    placeholder="Transaction ID / Ref No."
+                                    disabled={!selectedStudent}
+                                />
+                            )}
+
+                            {paymentMethod === "Receipt Book" && (
+                                <input
+                                    type="text"
+                                    value={receiptNumber}
+                                    onChange={(e) => setReceiptNumber(e.target.value)}
+                                    className="form-input"
+                                    placeholder="Receipt Number"
+                                    disabled={!selectedStudent}
+                                />
+                            )}
+
+                            {["Cash", "Other"].includes(paymentMethod) && (
+                                <input
+                                    type="text"
+                                    value={paymentNote}
+                                    onChange={(e) => setPaymentNote(e.target.value)}
+                                    className="form-input"
+                                    placeholder="Add a note (optional)"
+                                    disabled={!selectedStudent}
+                                />
+                            )}
                         </div>
 
                         <div className="form-group">

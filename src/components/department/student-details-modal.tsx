@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { getStudentDetails } from "@/app/actions/student";
 import { format as formatDate } from "date-fns";
-import { Loader2, Calendar, TrendingUp, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Loader2, Calendar, TrendingUp, CheckCircle, Clock, AlertCircle, Pencil, X, Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface StudentDetailsModalProps {
@@ -32,6 +32,40 @@ interface StudentDetails {
 export function StudentDetailsModal({ isOpen, onClose, studentId, isAdmin }: StudentDetailsModalProps) {
     const [student, setStudent] = useState<StudentDetails | null>(null);
     const [loading, setLoading] = useState(false);
+
+    // Edit state
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editValue, setEditValue] = useState("");
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleStartEdit = (contribution: any) => {
+        setEditingId(contribution.id);
+        setEditValue(contribution.reference || "");
+    };
+
+    const handleSaveEdit = async (contributionId: string) => {
+        if (!editValue.trim()) return;
+        setIsSaving(true);
+        try {
+            const res = await fetch("/api/admin/update-contribution", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contributionId, reference: editValue }),
+            });
+
+            if (res.ok && student) {
+                const updatedContributions = student.contributions.map(c =>
+                    c.id === contributionId ? { ...c, reference: editValue } : c
+                );
+                setStudent({ ...student, contributions: updatedContributions });
+                setEditingId(null);
+            }
+        } catch (error) {
+            console.error("Failed to update contribution", error);
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     useEffect(() => {
         if (isOpen && studentId) {
@@ -114,7 +148,7 @@ export function StudentDetailsModal({ isOpen, onClose, studentId, isAdmin }: Stu
                                             initial={{ opacity: 0, x: -10 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: idx * 0.05 }}
-                                            className="flex items-center justify-between p-3 rounded-lg bg-card border border-border/50 hover:bg-secondary/50 transition-colors"
+                                            className="group flex items-center justify-between p-3 rounded-lg bg-card border border-border/50 hover:bg-secondary/50 transition-colors"
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-500">
@@ -126,10 +160,49 @@ export function StudentDetailsModal({ isOpen, onClose, studentId, isAdmin }: Stu
                                                         <Calendar size={10} />
                                                         {formatDate(new Date(contribution.createdAt), "MMM d, yyyy 'at' h:mm a")}
                                                     </p>
-                                                    {isAdmin && contribution.reference && (
-                                                        <p className="text-xs text-blue-400 mt-0.5">
-                                                            Ref: {contribution.reference}
-                                                        </p>
+                                                    {isAdmin && !editingId && (
+                                                        <div className="flex items-center gap-2 mt-0.5">
+                                                            {contribution.reference ? (
+                                                                <p className="text-xs text-blue-400">
+                                                                    Ref: {contribution.reference}
+                                                                </p>
+                                                            ) : (
+                                                                <span className="text-xs text-muted-foreground/50 italic">No reference</span>
+                                                            )}
+
+                                                            <button
+                                                                onClick={() => handleStartEdit(contribution)}
+                                                                className="text-muted-foreground hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                                                                title={contribution.reference ? "Edit Reference" : "Add Reference"}
+                                                            >
+                                                                <Pencil size={10} />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                    {editingId === contribution.id && (
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <input
+                                                                type="text"
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                className="text-xs bg-black/20 border border-white/10 rounded px-2 py-1 text-white focus:outline-none focus:border-white/30 w-full min-w-[150px]"
+                                                                placeholder="Enter reference..."
+                                                                autoFocus
+                                                            />
+                                                            <button
+                                                                onClick={() => handleSaveEdit(contribution.id)}
+                                                                disabled={isSaving}
+                                                                className="text-green-400 hover:text-green-300"
+                                                            >
+                                                                <Check size={12} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setEditingId(null)}
+                                                                className="text-red-400 hover:text-red-300"
+                                                            >
+                                                                <X size={12} />
+                                                            </button>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
