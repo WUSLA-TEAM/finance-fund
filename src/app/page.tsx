@@ -3,7 +3,14 @@ import { DashboardView } from "@/components/dashboard-view";
 
 export const dynamic = "force-dynamic";
 
+import { checkAuth } from "@/lib/auth";
+
 async function getDashboardData() {
+  // Check user role
+  const isAdmin = await checkAuth("admin");
+  const isDeveloper = await checkAuth("developer");
+  const isPrivileged = isAdmin || isDeveloper;
+
   // 1. Stats (Hero)
   const totalCollectedAgg = await prisma.student.aggregate({ _sum: { amountPaid: true } });
 
@@ -73,7 +80,15 @@ async function getDashboardData() {
     orderBy: { name: 'asc' }
   });
 
-  const departments = departmentsData.map((dept) => {
+  // Filter out coordinators department if not privileged
+  const filteredDepartments = departmentsData.filter(dept => {
+    if (isPrivileged) return true;
+    const lowerName = dept.name.toLowerCase();
+    // Filter out any department with "coordinater" or "coordinator" in the name
+    return !lowerName.includes("coordinater") && !lowerName.includes("coordinator");
+  });
+
+  const departments = filteredDepartments.map((dept) => {
     const studentCount = dept.students.length;
     const target = studentCount * 5000;
     const collected = dept.students.reduce((acc: number, s: any) => acc + s.amountPaid, 0);

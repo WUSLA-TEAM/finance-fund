@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { checkAuth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
     try {
+        // Check user role
+        const isAdmin = await checkAuth("admin");
+        const isDeveloper = await checkAuth("developer");
+        const isPrivileged = isAdmin || isDeveloper;
+
         // 1. Stats (Hero)
         const totalCollectedAgg = await prisma.student.aggregate({ _sum: { amountPaid: true } });
         const totalTargetAgg = await prisma.student.aggregate({ _sum: { target: true } });
@@ -72,7 +78,14 @@ export async function GET() {
             orderBy: { name: 'asc' }
         });
 
-        const departments = departmentsData.map((dept) => {
+        // Filter out coordinators department if not privileged
+        const filteredDepartments = departmentsData.filter(dept => {
+            if (isPrivileged) return true;
+            const lowerName = dept.name.toLowerCase();
+            return !lowerName.includes("coordinater") && !lowerName.includes("coordinator");
+        });
+
+        const departments = filteredDepartments.map((dept) => {
             const studentCount = dept.students.length;
             const target = studentCount * 5000; // Rule: 5k per student
             const collected = dept.students.reduce((acc: number, s: any) => acc + s.amountPaid, 0);
