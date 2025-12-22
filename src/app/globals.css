@@ -49,35 +49,47 @@
 }
 
 .dark {
-    /* Professional Dark Mode */
-    --bg-main: #020617;
-    /* Slate-950 */
-    --bg-panel: #0f172a;
-    /* Slate-900 */
-    --bg-sidebar: #0f172a;
-    --bg-right: #0f172a;
+    /* Branding Orange Scheme - High Performance Luxury */
+    --bg-main: #000000;
+    /* Pure Black */
+    --bg-panel: #0a0a0a;
+    /* Almost Black */
+    --bg-sidebar: #050505;
 
-    --primary: #f8fafc;
-    /* Slate-50 (Text becomes primary in dark) */
-    --primary-dark: #e2e8f0;
-    --primary-light: #94a3b8;
+    /* PALETTE FROM IMAGE */
+    --brand-orange: #E85002;
+    --brand-dark-orange: #C10801;
+    --brand-light-orange: #F16001;
+    --brand-gray: #646464;
+    --brand-light-gray: #A7A7A7;
+    --brand-dark-gray: #333333;
 
-    --accent-success: #34d399;
-    /* Emerald-400 */
-    --accent-warning: #fbbf24;
-    /* Amber-400 */
+    --primary: #E85002;
+    --primary-foreground: #FFFFFF;
 
-    --text-main: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    --accent-success: #10b981;
+    --accent-warning: #E85002;
+    /* Use Brand Orange for warning/attention */
+    --accent-info: #3b82f6;
 
-    --border-color: #1e293b;
-    /* Slate-800 */
-    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-    --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --text-main: #F9F9F9;
+    /* White from palette */
+    --text-secondary: #A7A7A7;
+    /* Light Gray from palette */
+    --text-muted: #646464;
+    /* Gray from palette */
 
-    --input-bg: #1e293b;
-    --input-border: 1px solid #334155;
+    --border-color: #333333;
+    /* Dark Gray from palette */
+    --input-bg: #111111;
+    --input-border: 1px solid #333333;
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.8);
+    --shadow-card: 0 0 0 1px #333333, 0 10px 40px -10px rgba(0, 0, 0, 1);
+
+    /* Branding Gradient */
+    --branding-gradient: linear-gradient(135deg, #C10801 0%, #E85002 50%, #F16001 100%);
 }
 
 body {
@@ -87,6 +99,148 @@ body {
     min-height: 100vh;
     line-height: 1.5;
 }
+
+/* BRANDING UTILITIES */
+.bg-brand-gradient {
+    background: var(--branding-gradient);
+}
+
+.text-brand {
+    color: var(--brand-orange);
+}
+
+.border-brand {
+    border-color: var(--brand-orange);
+}
+
+/* Premium Card Style - Rich, Deep, Metallic */
+.brand-card {
+    /* "Rich" Dark Background: Subtle gradient from Dark Gray to Pure Black */
+    background: linear-gradient(180deg, #151515 0%, #050505 100%);
+
+    /* Metallic/Glassy Border Effect */
+    border: 1px solid #222222;
+    border-top: 1px solid #333333;
+    /* Top highlight for depth */
+
+    /* Deep "floating" shadow */
+    box-shadow:
+        0 10px 30px -10px rgba(0, 0, 0, 1),
+        0 0 0 1px rgba(255, 255, 255, 0.03);
+    /* Subtle inner ring */
+}
+
+.brand-card:hover {
+    /* Subtle lifting effect + Orange Glow */
+    transform: translateY(-2px);
+    border-color: #444444;
+    border-top-color: #555555;
+    box-shadow:
+        0 20px 40px -10px rgba(0, 0, 0, 1),
+        0 0 30px rgba(232, 80, 2, 0.15);
+    /* Branding Orange Glow */
+}
+
+/* Active Glass Variant for Hero Sections */
+.brand-glass {
+    background: rgba(20, 20, 20, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Liquid Glass Effect */
+.liquid-glass-card {
+    background: rgba(20, 20, 20, 0.4);
+    /* Darker base for contrast */
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+    /* Gradient Border (Outline) */
+    border: 1px solid transparent;
+    border-image: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(232, 80, 2, 0.3) 50%, rgba(255, 255, 255, 0.1) 100%) 1;
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+
+    /* Fallback for mask-composite support issues - simpler glass border */
+    box-shadow:
+        0 8px 32px 0 rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+    position: relative;
+    overflow: hidden;
+}
+
+/* Fallback border solution since border-image with border-radius is tricky */
+.liquid-glass-card {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 1),
+        /* Dark ring */
+        0 10px 40px -10px rgba(0, 0, 0, 1),
+        inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+.liquid-glass-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(232, 80, 2, 0.4), rgba(255, 255, 255, 0.1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.8;
+}
+
+/* Liquid "Flow" Animation */
+.liquid-glass-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.05),
+            rgba(232, 80, 2, 0.1),
+            rgba(255, 255, 255, 0.05),
+            transparent);
+    transform: skewX(-25deg);
+    animation: flow 8s infinite linear;
+    pointer-events: none;
+}
+
+@keyframes flow {
+    0% {
+        transform: translateX(-50%) skewX(-25deg);
+    }
+
+    100% {
+        transform: translateX(50%) skewX(-25deg);
+    }
+}
+
+/* Active Highlight */
+.brand-active {
+    border-color: var(--brand-orange);
+    box-shadow: 0 0 0 1px var(--brand-orange), 0 0 30px rgba(232, 80, 2, 0.3);
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
 
 /* ===== APP LAYOUT & GLASS ===== */
 .app-wrapper {
@@ -130,7 +284,7 @@ body {
     background: var(--bg-panel);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: var(--glass-border);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: var(--shadow-soft);
     border-radius: var(--radius-lg);
 }
