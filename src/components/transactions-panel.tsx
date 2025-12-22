@@ -38,56 +38,56 @@ function getDateLabel(): string {
 
 export function TransactionsPanel({ students }: TransactionsPanelProps) {
     return (
-        <aside className="right-panel">
-            {/* Header */}
-            <div className="panel-header">
-                <h2 className="panel-title">Recent Activity</h2>
-            </div>
+        <aside className="h-full relative z-10">
+            <div className="glass-panel h-full p-6 relative overflow-hidden flex flex-col">
+                {/* Decorative background glow */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-[60px] -mr-16 -mt-16 pointer-events-none" />
 
-            {/* Date Label */}
-            <p className="date-label">{getDateLabel()}</p>
+                {/* Header */}
+                <div className="flex justify-between items-center mb-6 relative z-10">
+                    <div>
+                        <h2 className="text-lg font-bold text-gray-800 dark:text-white">Recent Activity</h2>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{getDateLabel()}</p>
+                    </div>
+                </div>
 
-            {/* Activity List */}
-            <motion.div
-                className="transaction-list"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4 }}
-            >
-                {students.slice(0, 10).map((student, index) => (
-                    <motion.div
-                        key={student.id}
-                        className="transaction-item"
-                        initial={{ opacity: 0, x: 15 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
-                        <div className="transaction-left">
-                            <div className="transaction-icon positive">
-                                <ArrowDownLeft size={16} />
+                {/* Activity List */}
+                <motion.div
+                    className="flex-1 overflow-y-auto -mx-4 px-4 space-y-3 custom-scrollbar"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4 }}
+                >
+                    {students.slice(0, 10).map((student, index) => (
+                        <motion.div
+                            key={student.id}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.05 }}
+                            className="group flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20 hover:bg-white/60 dark:hover:bg-white/10 transition-all backdrop-blur-sm"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-green-100/50 dark:bg-green-900/30 text-green-700 dark:text-green-400 flex items-center justify-center border border-green-200/50 shadow-sm group-hover:scale-110 transition-transform">
+                                    <ArrowDownLeft size={18} />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 leading-tight">{student.name}</h4>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">{student.department.name}</p>
+                                </div>
                             </div>
-                            <div className="transaction-info">
-                                <span className="transaction-name">{student.name}</span>
-                                <span className="transaction-dept">{student.department.name}</span>
-                            </div>
+                            <span className="font-mono font-bold text-green-600 dark:text-green-400 text-sm">
+                                +{formatCurrency(student.amountPaid)}
+                            </span>
+                        </motion.div>
+                    ))}
+
+                    {students.length === 0 && (
+                        <div className="h-full flex flex-col items-center justify-center text-gray-400 text-sm opacity-60">
+                            <p>No recent activity</p>
                         </div>
-                        <span className="transaction-amount positive">
-                            {formatCurrency(student.amountPaid)}
-                        </span>
-                    </motion.div>
-                ))}
-
-                {students.length === 0 && (
-                    <p style={{
-                        textAlign: 'center',
-                        padding: '32px 16px',
-                        color: 'var(--text-muted)',
-                        fontSize: '14px'
-                    }}>
-                        No recent activity
-                    </p>
-                )}
-            </motion.div>
+                    )}
+                </motion.div>
+            </div>
         </aside>
     );
 }

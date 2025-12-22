@@ -194,6 +194,7 @@ export function HeroStats({ totalCollected, goal, topStudents, dailyStats }: Her
                 {/* Quick Actions & Stats */}
                 <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Top Contributors Panel */}
+                    {/* Top Contributors Panel */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -205,14 +206,66 @@ export function HeroStats({ totalCollected, goal, topStudents, dailyStats }: Her
                             <span className="text-xs text-blue-600 font-medium cursor-pointer hover:underline">View All</span>
                         </div>
 
-                        <div className="flex-1 space-y-4">
+                        {/* Mobile View: Horizontal Scroll Cards */}
+                        <div className="md:hidden flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 scrollbar-hide snap-x intro-x">
                             {currentTopStudents.map((student, index) => (
-                                <div key={student.id} className="flex items-center justify-between group cursor-pointer">
+                                <div
+                                    key={`mobile-${student.id}`}
+                                    className="min-w-[260px] bg-gradient-to-br from-white to-gray-50 p-5 rounded-2xl border border-gray-100 shadow-sm snap-center flex flex-col gap-4 relative overflow-hidden group"
+                                >
+                                    {/* Decoration Background */}
+                                    <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-10 -mr-10 -mt-10 ${index === 0 ? 'bg-yellow-500' :
+                                            index === 1 ? 'bg-gray-500' :
+                                                index === 2 ? 'bg-orange-500' : 'bg-blue-500'
+                                        }`} />
+
+                                    <div className="flex items-start justify-between relative z-10">
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold shadow-sm ${index === 0 ? 'bg-gradient-to-br from-yellow-100 to-amber-200 text-amber-800 border-amber-200' :
+                                                index === 1 ? 'bg-gradient-to-br from-gray-100 to-slate-200 text-slate-700 border-slate-200' :
+                                                    index === 2 ? 'bg-gradient-to-br from-orange-100 to-red-200 text-orange-800 border-orange-200' :
+                                                        'bg-gradient-to-br from-blue-50 to-indigo-100 text-indigo-700 border-indigo-100'
+                                            }`}>
+                                            #{index + 1}
+                                        </div>
+                                        {index < 3 && (
+                                            <div className="bg-white/80 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider text-gray-500 border border-gray-100 shadow-sm">
+                                                Top {index + 1}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="relative z-10">
+                                        <h4 className="font-bold text-gray-800 text-lg leading-tight mb-1 line-clamp-2">{student.name}</h4>
+                                        <p className="text-xs text-gray-500 font-medium bg-gray-100 inline-block px-2 py-1 rounded-md mb-3">
+                                            {student.department}
+                                        </p>
+
+                                        <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                                            <div className={`p-1.5 rounded-full ${index === 0 ? 'bg-amber-100 text-amber-600' : 'bg-blue-50 text-blue-600'
+                                                }`}>
+                                                <TrendingUp size={14} />
+                                            </div>
+                                            <span className="text-xl font-bold text-gray-900">
+                                                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(student.amount)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {currentTopStudents.length === 0 && (
+                                <div className="w-full text-center py-8 text-gray-400 text-sm">No contributions yet</div>
+                            )}
+                        </div>
+
+                        {/* Desktop View: Vertical List (Hidden on Mobile) */}
+                        <div className="hidden md:flex flex-col flex-1 space-y-4">
+                            {currentTopStudents.map((student, index) => (
+                                <div key={student.id} className="flex items-center justify-between group cursor-pointer p-2 hover:bg-gray-50 rounded-xl transition-colors duration-200">
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${index === 0 ? 'bg-yellow-100 text-yellow-700' :
-                                            index === 1 ? 'bg-gray-100 text-gray-700' :
-                                                index === 2 ? 'bg-orange-100 text-orange-700' :
-                                                    'bg-blue-50 text-blue-600'
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-transform group-hover:scale-110 ${index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                                                index === 1 ? 'bg-gray-100 text-gray-700' :
+                                                    index === 2 ? 'bg-orange-100 text-orange-700' :
+                                                        'bg-blue-50 text-blue-600'
                                             }`}>
                                             {index + 1}
                                         </div>
@@ -225,10 +278,12 @@ export function HeroStats({ totalCollected, goal, topStudents, dailyStats }: Her
                                         <p className="text-sm font-bold text-gray-800">
                                             {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(student.amount)}
                                         </p>
-                                        <div className="flex items-center justify-end gap-1 text-xs text-amber-500">
-                                            <TrendingUp size={12} />
-                                            <span>Top</span>
-                                        </div>
+                                        {index < 3 && (
+                                            <div className="flex items-center justify-end gap-1 text-xs text-amber-500">
+                                                <TrendingUp size={12} />
+                                                <span>Top</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))}
